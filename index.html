@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#111827">
+<title>Prompt Hub — 120+ Slash Codes</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f6f8;color:#111827;font-family:Arial,"Tahoma",sans-serif}
+header{background:#111827;color:#fff;padding:18px 16px 16px;position:sticky;top:0;z-index:10;box-shadow:0 2px 12px #0002}
+header h1{margin:0 0 5px;font-size:22px}
+header p{margin:0;color:#cbd5e1;font-size:13px}
+.wrap{max-width:780px;margin:auto;padding:14px}
+.search{width:100%;border:1px solid #d1d5db;border-radius:14px;padding:13px 15px;font-size:16px;outline:none;margin-bottom:12px;background:#fff}
+.cats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.cat{border:1px solid #d1d5db;background:#fff;border-radius:20px;padding:8px 14px;font-size:13px;cursor:pointer;color:#374151}
+.cat.active,.cat:hover{background:#111827;color:#fff;border-color:#111827}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:15px;margin:10px 0;box-shadow:0 3px 12px #0000000a}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.num{width:34px;height:34px;border-radius:11px;background:#111827;color:#fff;display:grid;place-items:center;font-weight:bold;font-size:13px;flex-shrink:0}
+.title{font-size:16px;font-weight:700;flex:1}
+.desc{color:#6b7280;font-size:13px;margin-bottom:10px}
+.prompt{background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:11px;font-size:14px;line-height:1.7;white-space:pre-wrap}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+button{border:0;border-radius:12px;padding:12px;font-size:14px;font-weight:700;cursor:pointer}
+.copy{background:#111827;color:#fff}
+.open{background:#e5e7eb;color:#111827}
+button:active{transform:scale(.98)}
+.add{width:100%;background:#2563eb;color:#fff;margin:8px 0 14px;padding:13px;border-radius:12px;font-size:15px;font-weight:700;border:0;cursor:pointer}
+.editor{display:none;background:#fff;border:1px solid #dbe2ea;border-radius:18px;padding:15px;margin-bottom:14px}
+.editor.show{display:block}
+input,textarea{width:100%;border:1px solid #d1d5db;border-radius:12px;padding:12px;font-size:15px;margin:5px 0 10px;outline:none}
+textarea{min-height:120px;resize:vertical}
+.save{background:#16a34a;color:#fff;width:100%;padding:12px;border:0;border-radius:12px;font-weight:700;cursor:pointer}
+.empty{text-align:center;color:#6b7280;padding:30px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:11px 17px;border-radius:12px;display:none;z-index:99;font-size:14px}
+.footer{text-align:center;color:#9ca3af;font-size:12px;padding:15px}
+.stack-bar{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:12px;margin-bottom:14px;display:none}
+.stack-bar.show{display:block}
+.stack-codes{font-size:14px;color:#4b5563;margin-bottom:8px;word-break:break-all}
+.stack-actions{display:flex;gap:8px}
+.stack-actions button{flex:1}
+</style>
+</head>
+<body>
+<header>
+  <h1>🚀 Prompt Hub — 120+ Slash Codes</h1>
+  <p>99 الأصلية + أكواد جديدة قوية • انسخ وافتح Gemini</p>
+</header>
+
+<div class="wrap">
+  <input id="search" class="search" placeholder="🔎 ابحث عن كود... (مثال: human, seo, critic)" oninput="render()">
+
+  <div class="cats" id="cats"></div>
+
+  <div class="stack-bar" id="stackBar">
+    <div class="stack-codes" id="stackCodes">لم يتم اختيار أكواد بعد</div>
+    <div class="stack-actions">
+      <button class="copy" onclick="copyStack()">📋 نسخ الأكواد المختارة</button>
+      <button class="open" onclick="clearStack()">مسح الاختيار</button>
+    </div>
+  </div>
+
+  <button class="add" onclick="toggleEditor()">＋ إضافة برومبت خاص</button>
+
+  <div id="editor" class="editor">
+    <input id="newTitle" placeholder="اسم البرومبت (مثال: /mycode)">
+    <input id="newTag" placeholder="وصف مختصر">
+    <textarea id="newPrompt" placeholder="اكتب البرومبت الكامل هنا..."></textarea>
+    <button class="save" onclick="saveNew()">حفظ البرومبت</button>
+  </div>
+
+  <div id="list"></div>
+  <div class="footer">البرومبتات الخاصة تُحفظ على جهازك داخل المتصفح • أكثر من 120 كود جاهز</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const defaults = [
+  // ===== WRITING & TONE (1-11) =====
+  {cat:"كتابة ونبرة", title:"/human", tag:"كتابة طبيعية وبشرية", prompt:"/human\nاكتب بطريقة طبيعية وبشرية، بأسلوب سلس وعفوي، وتجنب الأسلوب الآلي أو المكرر."},
+  {cat:"كتابة ونبرة", title:"/expert", tag:"إجابة بمستوى متخصص", prompt:"/expert\nتصرف كخبير متخصص في هذا المجال، وقدّم إجابة دقيقة وعميقة مع التفاصيل المهمة والأمثلة العملية."},
+  {cat:"كتابة ونبرة", title:"/ceo", tag:"تحليل بعقلية المؤسس", prompt:"/ceo\nحلّل الموضوع بعقلية مدير تنفيذي ومؤسس شركة، وركّز على القرارات، الأولويات، المخاطر، والفرص والنمو."},
+  {cat:"كتابة ونبرة", title:"/viral", tag:"أفكار عالية التفاعل", prompt:"/viral\nأنشئ أفكاراً قوية وقابلة للانتشار، وركّز على جذب الانتباه، زيادة التفاعل، وإثارة الفضول والمشاركة."},
+  {cat:"كتابة ونبرة", title:"/seo", tag:"محتوى محسّن لمحركات البحث", prompt:"/seo\nاكتب محتوى محسّناً لمحركات البحث، مع كلمات مفتاحية مناسبة، عناوين قوية، وتنظيم يساعد على الظهور في نتائج البحث."},
+  {cat:"كتابة ونبرة", title:"/critic", tag:"اكتشاف نقاط الضعف", prompt:"/critic\nحلّل الفكرة أو العمل بشكل نقدي، واكتشف نقاط الضعف والأخطاء والثغرات، ثم اقترح حلولاً عملية لتحسينها."},
+  {cat:"كتابة ونبرة", title:"/teacher", tag:"شرح واضح وبسيط", prompt:"/teacher\nاشرح الموضوع بطريقة واضحة وبسيطة ومنظمة، خطوة بخطوة، مع أمثلة تساعد على فهمه بسهولة."},
+  {cat:"كتابة ونبرة", title:"/eli5", tag:"شرح مبسط جداً", prompt:"/eli5\nاشرح الموضوع وكأنك تشرحه لطفل عمره 5 سنوات، باستخدام كلمات بسيطة جداً وأمثلة سهلة."},
+  {cat:"كتابة ونبرة", title:"/brief", tag:"أقصر إجابة ممكنة", prompt:"/brief\nأعطني أقصر إجابة ممكنة، مباشرة وواضحة، مع ذكر المعلومات الأساسية فقط."},
+  {cat:"كتابة ونبرة", title:"/strategy", tag:"تخطيط طويل المدى", prompt:"/strategy\nحلّل الموضوع بعقلية استراتيجية طويلة المدى، وحدد الأهداف، الأولويات، الخطوات، المخاطر، والفرص، ثم ضع خطة عملية قابلة للتنفيذ."},
+  {cat:"كتابة ونبرة", title:"/copywriter", tag:"نصوص تسويقية مقنعة", prompt:"/copywriter\nاكتب نصوصاً تسويقية مقنعة وجذابة، تركّز على الفوائد وتحث على اتخاذ إجراء."},
+
+  // ===== THINKING & RESEARCH (12-22) =====
+  {cat:"تفكير وبحث", title:"/research", tag:"وضع بحث عميق", prompt:"/research\nقم ببحث عميق وشامل عن الموضوع، واذكر المصادر أو النقاط الأساسية المهمة."},
+  {cat:"تفكير وبحث", title:"/brainstorm", tag:"توليد أفكار إبداعية", prompt:"/brainstorm\nولّد مجموعة كبيرة ومتنوعة من الأفكار الإبداعية حول هذا الموضوع، بما في ذلك أفكار غير تقليدية."},
+  {cat:"تفكير وبحث", title:"/promptengineer", tag:"تحسين أي برومبت", prompt:"/promptengineer\nحسّن هذا البرومبت واجعله أقوى وأكثر وضوحاً وفعالية."},
+  {cat:"تفكير وبحث", title:"/summarize", tag:"تلخيص النقاط الرئيسية", prompt:"/summarize\nلخّص النقاط الرئيسية بشكل مختصر ومنظم."},
+  {cat:"تفكير وبحث", title:"/simplify", tag:"تبسيط المحتوى المعقد", prompt:"/simplify\nبسّط هذا المحتوى المعقد واجعله سهلاً للفهم دون فقدان المعنى الأساسي."},
+  {cat:"تفكير وبحث", title:"/detailed", tag:"شرح شامل ومفصل", prompt:"/detailed\nقدّم شرحاً شاملاً ومفصلاً يغطي كل الجوانب المهمة."},
+  {cat:"تفكير وبحث", title:"/stepbystep", tag:"شرح خطوة بخطوة", prompt:"/stepbystep\nاشرح الموضوع خطوة بخطوة بشكل واضح ومنظم."},
+  {cat:"تفكير وبحث", title:"/examples", tag:"أمثلة عملية", prompt:"/examples\nقدّم أمثلة عملية وواقعية توضح الفكرة."},
+  {cat:"تفكير وبحث", title:"/analyst", tag:"تحليل بيانات أو معلومات", prompt:"/analyst\nحلّل البيانات أو المعلومات بعمق، واستخرج الرؤى والأنماط المهمة."},
+  {cat:"تفكير وبحث", title:"/compare", tag:"مقارنة عدة خيارات", prompt:"/compare\nقارن بين الخيارات المتاحة بشكل واضح ومنظم."},
+  {cat:"تفكير وبحث", title:"/proscons", tag:"إيجابيات وسلبيات", prompt:"/proscons\nاعرض الإيجابيات والسلبيات بشكل متوازن وواضح."},
+
+  // ===== CAREER & LEARNING =====
+  {cat:"مهنة وتعلم", title:"/flashcards", tag:"بطاقات دراسة", prompt:"/flashcards\nأنشئ بطاقات دراسة (Flashcards) واضحة ومفيدة لهذا الموضوع."},
+  {cat:"مهنة وتعلم", title:"/interview", tag:"تحضير لمقابلة عمل", prompt:"/interview\nساعدني في التحضير لمقابلة عمل حول هذا الموضوع، مع أسئلة متوقعة وإجابات قوية."},
+  {cat:"مهنة وتعلم", title:"/resume", tag:"تحسين السيرة الذاتية", prompt:"/resume\nحسّن محتوى السيرة الذاتية واجعله أقوى وأكثر احترافية."},
+  {cat:"مهنة وتعلم", title:"/career", tag:"توجيه مهني", prompt:"/career\nقدّم توجيهاً مهنياً عملياً حول هذا الموضوع."},
+  {cat:"مهنة وتعلم", title:"/mentor", tag:"رد كمرشد شخصي", prompt:"/mentor\nتصرف كمرشد شخصي داعم وقدم نصائح عملية وملهمة."},
+  {cat:"مهنة وتعلم", title:"/coach", tag:"إرشاد عملي", prompt:"/coach\nقدّم إرشاداً عملياً خطوة بخطوة يساعدني على التقدم."},
+  {cat:"مهنة وتعلم", title:"/consultant", tag:"توصيات خبيرة", prompt:"/consultant\nتصرف كمستشار خبير وقدم توصيات واضحة وقابلة للتنفيذ."},
+  {cat:"مهنة وتعلم", title:"/editor", tag:"تحسين الوضوح والجودة", prompt:"/editor\nحسّن النص من حيث الوضوح والجودة والأسلوب."},
+  {cat:"مهنة وتعلم", title:"/proofread", tag:"تصحيح نحوي وإملائي", prompt:"/proofread\nصحّح الأخطاء النحوية والإملائية وحسّن الصياغة."},
+  {cat:"مهنة وتعلم", title:"/rewrite", tag:"إعادة كتابة بأسلوب أفضل", prompt:"/rewrite\nأعد كتابة النص بأسلوب أفضل وأكثر سلاسة."},
+  {cat:"مهنة وتعلم", title:"/professional", tag:"جعل الكتابة احترافية", prompt:"/professional\nاجعل الكتابة أكثر احترافية ومناسبة لبيئة العمل."},
+
+  // ===== TONE & VOICE =====
+  {cat:"نبرة وصوت", title:"/casual", tag:"نبرة محادثة", prompt:"/casual\nاكتب بنبرة محادثة عادية وودية."},
+  {cat:"نبرة وصوت", title:"/friendly", tag:"نبرة ودية ودافئة", prompt:"/friendly\nاجعل النبرة ودية ودافئة ومريحة."},
+  {cat:"نبرة وصوت", title:"/persuasive", tag:"جعل الرسالة أكثر إقناعاً", prompt:"/persuasive\nاجعل الرسالة أكثر إقناعاً وتأثيراً."},
+  {cat:"نبرة وصوت", title:"/concise", tag:"حذف الكلمات الزائدة", prompt:"/concise\nاحذف الكلمات الزائدة واجعل النص مختصراً وقوياً."},
+  {cat:"نبرة وصوت", title:"/polish", tag:"النسخة النهائية المصقولة", prompt:"/polish\nصقل النص ليصبح جاهزاً للنشر أو الإرسال."},
+  {cat:"نبرة وصوت", title:"/tone", tag:"تعديل نبرة الكتابة", prompt:"/tone\nعدّل نبرة الكتابة حسب المطلوب."},
+  {cat:"نبرة وصوت", title:"/storyteller", tag:"تحويل المعلومات إلى قصة", prompt:"/storyteller\nحوّل المعلومات إلى قصة جذابة ومشوقة."},
+  {cat:"نبرة وصوت", title:"/hook", tag:"افتتاحية جذابة", prompt:"/hook\nاكتب افتتاحية قوية تجذب الانتباه فوراً."},
+  {cat:"نبرة وصوت", title:"/headline", tag:"عنوان قوي وجذاب", prompt:"/headline\nاقترح عناوين قوية وجذابة."},
+  {cat:"نبرة وصوت", title:"/caption", tag:"كابشن لوسائل التواصل", prompt:"/caption\nاكتب كابشن مناسب لوسائل التواصل الاجتماعي."},
+  {cat:"نبرة وصوت", title:"/linkedin", tag:"محتوى لينكدإن", prompt:"/linkedin\nاكتب محتوى مناسباً لمنصة LinkedIn."},
+
+  // ===== SOCIAL & MARKETING =====
+  {cat:"سوشيال وتسويق", title:"/instagram", tag:"محتوى إنستغرام", prompt:"/instagram\nأنشئ محتوى مناسباً لإنستغرام."},
+  {cat:"سوشيال وتسويق", title:"/youtube", tag:"محتوى يوتيوب", prompt:"/youtube\nأنشئ أفكار أو سكريبت مناسب ليوتيوب."},
+  {cat:"سوشيال وتسويق", title:"/reels", tag:"أفكار ريلز قصيرة", prompt:"/reels\nاقترح أفكار ريلز قصيرة وجذابة."},
+  {cat:"سوشيال وتسويق", title:"/script", tag:"سكريبت فيديو أو عرض", prompt:"/script\nاكتب سكريبت جاهز لفيديو أو عرض تقديمي."},
+  {cat:"سوشيال وتسويق", title:"/email", tag:"إيميل فعال", prompt:"/email\nاكتب إيميلاً فعالاً وواضحاً."},
+  {cat:"سوشيال وتسويق", title:"/sales", tag:"رسالة موجهة للبيع", prompt:"/sales\nاكتب رسالة مبيعات مقنعة."},
+  {cat:"سوشيال وتسويق", title:"/offer", tag:"عرض لا يُقاوم", prompt:"/offer\nصمّم عرضاً جذاباً لا يُقاوم."},
+  {cat:"سوشيال وتسويق", title:"/brand", tag:"رسائل العلامة التجارية", prompt:"/brand\nاكتب رسائل تعبر عن هوية العلامة التجارية."},
+  {cat:"سوشيال وتسويق", title:"/customer", tag:"التفكير من وجهة نظر العميل", prompt:"/customer\nفكّر من وجهة نظر العميل واكتب وفقاً لذلك."},
+  {cat:"سوشيال وتسويق", title:"/audience", tag:"تحليل الجمهور المستهدف", prompt:"/audience\nحلّل الجمهور المستهدف وقدّم رؤى مفيدة."},
+  {cat:"سوشيال وتسويق", title:"/competitor", tag:"تحليل المنافسين", prompt:"/competitor\nحلّل المنافسين واستخرج نقاط القوة والضعف."},
+
+  // ===== BUSINESS & GROWTH =====
+  {cat:"أعمال ونمو", title:"/market", tag:"تحليل فرصة السوق", prompt:"/market\nحلّل فرصة السوق بشكل استراتيجي."},
+  {cat:"أعمال ونمو", title:"/startup", tag:"تفكير استراتيجي ناشئ", prompt:"/startup\nفكّر بعقلية مؤسس ستارت أب."},
+  {cat:"أعمال ونمو", title:"/business", tag:"تطوير فكرة عمل", prompt:"/business\nطوّر فكرة العمل بشكل عملي."},
+  {cat:"أعمال ونمو", title:"/pricing", tag:"استراتيجية تسعير", prompt:"/pricing\nاقترح استراتيجية تسعير مناسبة."},
+  {cat:"أعمال ونمو", title:"/funnel", tag:"بناء قمع تسويقي", prompt:"/funnel\nصمّم قمعاً تسويقياً فعالاً."},
+  {cat:"أعمال ونمو", title:"/growth", tag:"فرص النمو", prompt:"/growth\nحدد فرص النمو الرئيسية."},
+  {cat:"أعمال ونمو", title:"/content", tag:"استراتيجية محتوى", prompt:"/content\nضع استراتيجية محتوى واضحة."},
+  {cat:"أعمال ونمو", title:"/calendar", tag:"تقويم محتوى", prompt:"/calendar\nأنشئ تقويم محتوى عملي."},
+  {cat:"أعمال ونمو", title:"/ideas", tag:"أفكار جديدة", prompt:"/ideas\nولّد أفكاراً جديدة ومبتكرة."},
+  {cat:"أعمال ونمو", title:"/creative", tag:"تفكير إبداعي مختلف", prompt:"/creative\nفكّر بطريقة إبداعية وغير تقليدية."},
+  {cat:"أعمال ونمو", title:"/unpopular", tag:"تحدي الأفكار الشائعة", prompt:"/unpopular\nتحدّ الأفكار الشائعة وقدّم رؤية مختلفة."},
+
+  // ===== CRITICAL THINKING =====
+  {cat:"تفكير نقدي", title:"/devilsadvocate", tag:"الدفاع عن الرأي المعاكس", prompt:"/devilsadvocate\nدافع عن الرأي المعاكس بقوة ووضوح."},
+  {cat:"تفكير نقدي", title:"/contrarian", tag:"استكشاف وجهات نظر بديلة", prompt:"/contrarian\nاستكشف وجهات نظر بديلة وغير تقليدية."},
+  {cat:"تفكير نقدي", title:"/assumptions", tag:"اكتشاف الافتراضات الخفية", prompt:"/assumptions\nاكتشف الافتراضات الخفية في هذا الموضوع."},
+  {cat:"تفكير نقدي", title:"/risks", tag:"تحديد المخاطر المحتملة", prompt:"/risks\nحدد كل المخاطر المحتملة بوضوح."},
+  {cat:"تفكير نقدي", title:"/factcheck", tag:"فصل الحقائق عن الادعاءات", prompt:"/factcheck\nافصل الحقائق عن الادعاءات والآراء."},
+  {cat:"تفكير نقدي", title:"/verify", tag:"ما يحتاج للتحقق", prompt:"/verify\nحدد ما يحتاج إلى تحقق إضافي."},
+  {cat:"تفكير نقدي", title:"/logic", tag:"مراجعة المنطق والاستدلال", prompt:"/logic\nراجع المنطق والاستدلال في هذا الموضوع."},
+  {cat:"تفكير نقدي", title:"/rootcause", tag:"العثور على السبب الجذري", prompt:"/rootcause\nابحث عن السبب الجذري الحقيقي للمشكلة."},
+  {cat:"تفكير نقدي", title:"/debug", tag:"تحديد المشاكل وإصلاحها", prompt:"/debug\nحدد المشاكل واقترح حلولاً لإصلاحها."},
+  {cat:"تفكير نقدي", title:"/solution", tag:"حلول عملية", prompt:"/solution\nقدّم حلولاً عملية وقابلة للتنفيذ."},
+  {cat:"تفكير نقدي", title:"/alternative", tag:"اقتراح بدائل أفضل", prompt:"/alternative\nاقترح بدائل أفضل للوضع الحالي."},
+
+  // ===== STRUCTURE & FORMAT =====
+  {cat:"هيكل وتنسيق", title:"/optimize", tag:"تحسين نهج موجود", prompt:"/optimize\nحسّن النهج أو الطريقة الحالية."},
+  {cat:"هيكل وتنسيق", title:"/automate", tag:"طرق لأتمتة المهام", prompt:"/automate\nاقترح طرقاً لأتمتة هذه المهام."},
+  {cat:"هيكل وتنسيق", title:"/template", tag:"بناء قالب قابل لإعادة الاستخدام", prompt:"/template\nأنشئ قالباً واضحاً وقابل لإعادة الاستخدام."},
+  {cat:"هيكل وتنسيق", title:"/checklist", tag:"قائمة تحقق عملية", prompt:"/checklist\nأنشئ قائمة تحقق عملية ومرتبة."},
+  {cat:"هيكل وتنسيق", title:"/framework", tag:"إطار منظم", prompt:"/framework\nابنِ إطاراً منظماً وواضحاً."},
+  {cat:"هيكل وتنسيق", title:"/matrix", tag:"مصفوفة قرار", prompt:"/matrix\nنظّم الخيارات في مصفوفة قرار."},
+  {cat:"هيكل وتنسيق", title:"/table", tag:"تحويل المعلومات إلى جدول", prompt:"/table\nحوّل المعلومات إلى جدول منظم وواضح."},
+  {cat:"هيكل وتنسيق", title:"/json", tag:"تنسيق الإجابة بصيغة JSON", prompt:"/json\nقدّم الإجابة بصيغة JSON منظمة."},
+  {cat:"هيكل وتنسيق", title:"/roleplay", tag:"محاكاة سيناريو حقيقي", prompt:"/roleplay\nحاكِ سيناريو حقيقياً بشكل تفاعلي."},
+  {cat:"هيكل وتنسيق", title:"/reverse", tag:"العمل للخلف من النتيجة المطلوبة", prompt:"/reverse\nاعمل للخلف من النتيجة المطلوبة وحدد الخطوات."},
+  {cat:"هيكل وتنسيق", title:"/ultimate", tag:"الإجابة الأكثر اكتمالاً ممكنة", prompt:"/ultimate\nقدّم الإجابة الأكثر اكتمالاً وقوة ممكنة."},
+
+  // ===== أكواد جديدة قوية =====
+  {cat:"أكواد جديدة قوية", title:"/redteam", tag:"مهاجمة الفكرة واكتشاف نقاط الضعف", prompt:"/redteam\nهاجم هذه الفكرة أو الخطة بقوة، واكتشف كل نقاط الضعف والافتراضات الخاطئة والمخاطر، ثم اقترح تحسينات."},
+  {cat:"أكواد جديدة قوية", title:"/meta", tag:"تحليل السؤال أولاً قبل الإجابة", prompt:"/meta\nقبل أن تجيب، حلّل سؤالي أولاً: ما الذي أحاول حله فعلياً؟ ما الافتراضات التي قد أكون غافلاً عنها؟ وما النسخة الأفضل من هذا السؤال؟"},
+  {cat:"أكواد جديدة قوية", title:"/truth", tag:"الحقيقة الصريحة بدون مجاملة", prompt:"/truth\nتوقف عن المجاملة وأخبرني بالحقيقة الصريحة والمباشرة فقط، حتى لو كانت قاسية."},
+  {cat:"أكواد جديدة قوية", title:"/alt3", tag:"3 نسخ مختلفة تماماً", prompt:"/alt3\nأعطني 3 نسخ مختلفة تماماً من الإجابة، وليست مجرد إعادة صياغة لنفس الفكرة."},
+  {cat:"أكواد جديدة قوية", title:"/flood", tag:"20 فكرة دفعة واحدة", prompt:"/flood\nلا تعطني فكرة واحدة آمنة فقط، بل أعطني 20 فكرة متنوعة، بما في ذلك الأفكار الغريبة وغير التقليدية."},
+  {cat:"أكواد جديدة قوية", title:"/noyes", tag:"توقف عن الموافقة الدائمة", prompt:"/noyes\nتوقف عن الموافقة على كلامي افتراضياً. أخبرني أين أنا مخطئ وما هو أقوى حجة مضادة."},
+  {cat:"أكواد جديدة قوية", title:"/x10", tag:"تفكير أعمق 10 مرات", prompt:"/x10\nفكّر في الموضوع بعمق أكبر 10 مرات قبل الإجابة، وقدّم تحليلاً أعمق وأدق."},
+  {cat:"أكواد جديدة قوية", title:"/firstprinciples", tag:"التفكيك من الأساسيات", prompt:"/firstprinciples\nفكّك الموضوع من المبادئ الأساسية الأولى، ولا تعتمد على الآراء الشائعة."},
+  {cat:"أكواد جديدة قوية", title:"/socrates", tag:"التعليم بطرح الأسئلة", prompt:"/socrates\nعلّمني عن طريق طرح أسئلة عليّ، تماماً مثل أسلوب سقراط، بدلاً من إعطاء الإجابة مباشرة."},
+  {cat:"أكواد جديدة قوية", title:"/80/20", tag:"التركيز على الـ 20% الأهم", prompt:"/80/20\nركز على الـ 20% من الإجراءات أو الأفكار التي تعطي 80% من النتائج."},
+  {cat:"أكواد جديدة قوية", title:"/pushback", tag:"تحدي الفكرة قبل الالتزام", prompt:"/pushback\nتحدّ فكرتي بقوة قبل أن ألتزم بها، وأظهر لي أين قد أفشل."},
+  {cat:"أكواد جديدة قوية", title:"/finalcheck", tag:"مراجعة نهائية كاملة", prompt:"/finalcheck\nقم بمراجعة نهائية كاملة وشاملة قبل الإرسال أو النشر."},
+  {cat:"أكواد جديدة قوية", title:"/steelman", tag:"أقوى نسخة ممكنة من الفكرة", prompt:"/steelman\nقدّم أقوى نسخة ممكنة من فكرتي أو حجتي، ثم دافع عنها."},
+  {cat:"أكواد جديدة قوية", title:"/assumptions", tag:"كشف الافتراضات الخفية", prompt:"/assumptions\nاكشف كل الافتراضات الخفية التي تقوم عليها هذه الفكرة أو الخطة."},
+  {cat:"أكواد جديدة قوية", title:"/gaps", tag:"الأسئلة المهمة المنسية", prompt:"/gaps\nأخبرني بكل الأسئلة المهمة التي نسيتها ويجب أن أسألها."},
+  {cat:"أكواد جديدة قوية", title:"/rank", tag:"ترتيب الخيارات واختيار الأفضل", prompt:"/rank\nرتّب كل الخيارات مقابل بعضها واختر الأفضل مع التبرير."},
+  {cat:"أكواد جديدة قوية", title:"/tldr", tag:"ملخص سريع جداً", prompt:"/tldr\nأعطني ملخصاً سريعاً جداً في جملة أو جملتين فقط."},
+  {cat:"أكواد جديدة قوية", title:"/expand", tag:"توسيع النص وإضافة تفاصيل", prompt:"/expand\nوسّع هذا النص وأضف تفاصيل وأمثلة أكثر عمقاً."},
+  {cat:"أكواد جديدة قوية", title:"/shorten", tag:"اختصار قوي دون فقدان المعنى", prompt:"/shorten\nاختصر النص بقوة مع الحفاظ على المعنى الأساسي."},
+  {cat:"أكواد جديدة قوية", title:"/formal", tag:"أسلوب رسمي", prompt:"/formal\nحوّل النص إلى أسلوب رسمي واحترافي."},
+  {cat:"أكواد جديدة قوية", title:"/casual", tag:"أسلوب غير رسمي وودي", prompt:"/casual\nحوّل النص إلى أسلوب غير رسمي وودي ومحادثة."},
+  {cat:"أكواد جديدة قوية", title:"/allin", tag:"أقوى وأكمل إجابة ممكنة", prompt:"/allin\nأعطني أقوى وأكمل وأعمق إجابة ممكنة لديك حول هذا الموضوع."}
+];
+
+let custom = JSON.parse(localStorage.getItem("promptHubCustom") || "[]");
+let items = [...defaults, ...custom];
+let currentCat = "الكل";
+let selectedStack = new Set();
+
+function initCats() {
+  const cats = ["الكل", ...new Set(defaults.map(d => d.cat))];
+  const el = document.getElementById("cats");
+  el.innerHTML = cats.map(c => 
+    `<button class="cat ${c===currentCat?'active':''}" onclick="setCat('${c}')">${c}</button>`
+  ).join("");
+}
+
+function setCat(c) {
+  currentCat = c;
+  initCats();
+  render();
+}
+
+function render() {
+  const q = document.getElementById("search").value.trim().toLowerCase();
+  const filtered = items.filter(x => {
+    const matchCat = currentCat === "الكل" || x.cat === currentCat || (!x.cat && currentCat === "الكل");
+    const matchSearch = !q || (x.title + " " + (x.tag||"") + " " + x.prompt).toLowerCase().includes(q);
+    return matchCat && matchSearch;
+  });
+
+  const list = document.getElementById("list");
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty">لا توجد نتائج.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map((x, i) => `
+    <div class="card">
+      <div class="top">
+        <div class="num">${i+1}</div>
+        <div class="title">${escapeHtml(x.title)}</div>
+      </div>
+      <div class="desc">${escapeHtml(x.tag || "برومبت")}</div>
+      <div class="prompt">${escapeHtml(x.prompt)}</div>
+      <div class="actions">
+        <button class="copy" onclick='copyPrompt(${JSON.stringify(x.prompt)})'>📋 نسخ</button>
+        <button class="open" onclick='copyAndOpen(${JSON.stringify(x.prompt)})'>✨ نسخ + فتح Gemini</button>
+      </div>
+      <div style="margin-top:8px">
+        <button style="width:100%;background:#f3f4f6;color:#374151;border:0;border-radius:10px;padding:9px;font-size:13px;cursor:pointer"
+          onclick='toggleStack(${JSON.stringify(x.title)})'>
+          ${selectedStack.has(x.title) ? "✓ مضاف للستاك" : "＋ أضف للستاك"}
+        </button>
+      </div>
+    </div>
+  `).join("");
+
+  updateStackBar();
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+
+async function copyPrompt(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast("تم نسخ البرومبت ✓");
+  } catch(e) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    ta.remove();
+    toast("تم نسخ البرومبت ✓");
+  }
+}
+
+async function copyAndOpen(text) {
+  const w = window.open("https://gemini.google.com/app", "_blank");
+  await copyPrompt(text);
+  if (!w) toast("تم النسخ. افتح Gemini يدوياً إذا لم تفتح الصفحة.");
+}
+
+function toggleStack(title) {
+  if (selectedStack.has(title)) selectedStack.delete(title);
+  else selectedStack.add(title);
+  render();
+}
+
+function updateStackBar() {
+  const bar = document.getElementById("stackBar");
+  const codes = document.getElementById("stackCodes");
+  if (selectedStack.size === 0) {
+    bar.classList.remove("show");
+    return;
+  }
+  bar.classList.add("show");
+  codes.textContent = "الأكواد المختارة: " + Array.from(selectedStack).join("  ");
+}
+
+function copyStack() {
+  if (selectedStack.size === 0) return;
+  const text = Array.from(selectedStack).join(" ") + "\n";
+  copyPrompt(text);
+}
+
+function clearStack() {
+  selectedStack.clear();
+  render();
+}
+
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.style.display = "block";
+  clearTimeout(window.tt);
+  window.tt = setTimeout(() => t.style.display = "none", 1800);
+}
+
+function toggleEditor() {
+  document.getElementById("editor").classList.toggle("show");
+}
+
+function saveNew() {
+  const title = document.getElementById("newTitle").value.trim();
+  const tag = document.getElementById("newTag").value.trim();
+  const prompt = document.getElementById("newPrompt").value.trim();
+  if (!title || !prompt) {
+    toast("اكتب اسم البرومبت والنص أولاً");
+    return;
+  }
+  custom.push({title, tag: tag || "برومبت مخصص", prompt, cat: "مخصص"});
+  localStorage.setItem("promptHubCustom", JSON.stringify(custom));
+  items = [...defaults, ...custom];
+  document.getElementById("newTitle").value = "";
+  document.getElementById("newTag").value = "";
+  document.getElementById("newPrompt").value = "";
+  document.getElementById("editor").classList.remove("show");
+  render();
+  toast("تم حفظ البرومبت ✓");
+}
+
+initCats();
+render();
+</script>
+</body>
+</html>
